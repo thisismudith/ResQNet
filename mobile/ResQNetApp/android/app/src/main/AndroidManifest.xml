@@ -32,7 +32,7 @@
       android:supportsRtl="true">
       <meta-data
           android:name="com.google.android.gms.nearby.connection.SERVICE_ID"
-          android:value="@string/app_name" />
+          android:value="com.resqnetapp.nearby" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

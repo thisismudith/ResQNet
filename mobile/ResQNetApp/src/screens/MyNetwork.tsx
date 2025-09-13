@@ -1,7 +1,8 @@
 import React from 'react';
-import { SafeAreaView, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function VolunteerScreen() {
+export default function MyNetworkScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>My Network</Text>

@@ -4,12 +4,14 @@ export type AuthStackParamList = {
 };
 
 export type AppStackParamList = {
-  Tabs: undefined;
+  TopTabs: undefined;
+  SOS: undefined;
+  Guidelines: undefined;
 };
 
-export type BottomTabParamList = {
+export type TopTabParamList = {
   Home: undefined;
-  DisasterGuide: undefined;
+  Guidelines: undefined;
   Alerts: undefined;
-  Volunteer: undefined;
+  MyNetwork: undefined;
 };

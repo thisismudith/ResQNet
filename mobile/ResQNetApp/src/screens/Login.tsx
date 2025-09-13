@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, Text, Alert, ActivityIndicator, StyleSheet, View } from 'react-native';
+import { Text, Alert, ActivityIndicator, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../app/navigation/types.ts';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../ui/Button';
 import auth from '@react-native-firebase/auth';
 

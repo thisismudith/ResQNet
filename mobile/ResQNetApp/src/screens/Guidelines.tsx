@@ -1,10 +1,12 @@
 import React from 'react';
-import { SafeAreaView, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 export default function DisasterGuideScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Disaster Guide</Text>
+      <Text style={styles.title}>Guidelines</Text>
       <Text>Checklist, how-tos, and offline tips go here.</Text>
     </SafeAreaView>
   );

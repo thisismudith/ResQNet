@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import type { TopTabParamList } from './types';
 import HomeScreen from '../../screens/Home';
+import Apu from '../../screens/Demo';
 import GuidelinesScreen from '../../screens/Guidelines';
 import AlertsScreen from '../../screens/Alerts';
 import MyNetworkScreen from '../../screens/MyNetwork';
@@ -87,7 +88,7 @@ export default function TopTabsNavigator() {
       >
         <Tab.Screen
           name="Home"
-          component={HomeScreen}
+          component={Apu}
           options={{ tabBarLabel: TabLabel('home', 'Home') }}
         />
         <Tab.Screen

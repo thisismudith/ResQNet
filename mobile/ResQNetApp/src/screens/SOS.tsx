@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import Core from '../core';
 
 const COLORS = {
   bg: '#FFEDE8',
@@ -52,6 +53,7 @@ const OTHER_CHIPS: ChipDef[] = [
 ];
 
 const HOLD_MS = 3000;
+const CoreAPI = new Core();
 
 export default function SOS() {
   const navigation = useNavigation<any>();
@@ -80,6 +82,13 @@ export default function SOS() {
     // Alert.alert('SOS cancelled', `SOS cancelled`);
     setIsArmed(false);
   };
+
+  useEffect(() => {
+    if (isArmed) CoreAPI.start();
+    else CoreAPI.stop();
+
+    return () => CoreAPI.cleanup();
+  }, [isArmed]);
 
   const cancelArming = () => {
     setIsArming(false);

@@ -86,27 +86,127 @@ class NearbyConnectionModule(reactContext: ReactApplicationContext) : ReactConte
         }
     }
 
+    @ReactMethod
+    fun connectToEndpoint(endpointId: String) {
+        connectionsClient.requestConnection("", endpointId, connectionLifecycleCallback)
+            .addOnSuccessListener {
+                val params = Arguments.createMap()
+                params.putString("endpointId", endpointId)
+                sendEvent("onConnectionRequested", params)
+            }
+            .addOnFailureListener {
+                val params = Arguments.createMap()
+                params.putString("endpointId", endpointId)
+                params.putString("error", it.message)
+                sendEvent("onConnectionRequestFailed", params)
+            }
+    }
+
+    @ReactMethod
+    fun acceptConnection(endpointId: String) {
+        connectionsClient.acceptConnection(endpointId, payloadCallback)
+        val params = Arguments.createMap()
+        params.putString("endpointId", endpointId)
+        sendEvent("onConnectionAccepted", params)
+    }
+
+    @ReactMethod
+    fun rejectConnection(endpointId: String) {
+        connectionsClient.rejectConnection(endpointId)
+        val params = Arguments.createMap()
+        params.putString("endpointId", endpointId)
+        sendEvent("onConnectionRejected", params)
+    }
+
+    @ReactMethod
+    fun sendMessage(endpointId: String, message: String) {
+        val payload = Payload.fromBytes(message.toByteArray())
+        connectionsClient.sendPayload(endpointId, payload)
+            .addOnSuccessListener {
+                val params = Arguments.createMap()
+                params.putString("endpointId", endpointId)
+                params.putString("message", message)
+                sendEvent("onMessageSent", params)
+            }
+            .addOnFailureListener {
+                val params = Arguments.createMap()
+                params.putString("endpointId", endpointId)
+                params.putString("error", it.message)
+                sendEvent("onMessageSendFailed", params)
+            }
+    }
+
+    @ReactMethod
+    fun disconnectFromEndpoint(endpointId: String) {
+        connectionsClient.disconnectFromEndpoint(endpointId)
+        val params = Arguments.createMap()
+        params.putString("endpointId", endpointId)
+        sendEvent("onDisconnectedFromEndpoint", params)
+    }
+
     private val payloadCallback = object : PayloadCallback() {
         override fun onPayloadReceived(endpointId: String, payload: Payload) {
-            // A payload was received
+            when (payload.type) {
+                Payload.Type.BYTES -> {
+                    val message = String(payload.asBytes()!!)
+                    val params = Arguments.createMap()
+                    params.putString("endpointId", endpointId)
+                    params.putString("message", message)
+                    sendEvent("onMessageReceived", params)
+                }
+                Payload.Type.FILE -> {
+                    val params = Arguments.createMap()
+                    params.putString("endpointId", endpointId)
+                    params.putString("type", "file")
+                    sendEvent("onFileReceived", params)
+                }
+                Payload.Type.STREAM -> {
+                    val params = Arguments.createMap()
+                    params.putString("endpointId", endpointId)
+                    params.putString("type", "stream")
+                    sendEvent("onStreamReceived", params)
+                }
+            }
         }
 
         override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
-            // A payload transfer update was received
+            val params = Arguments.createMap()
+            params.putString("endpointId", endpointId)
+            params.putString("payloadId", update.payloadId.toString())
+            params.putString("status", update.status.toString())
+            params.putLong("bytesTransferred", update.bytesTransferred)
+            params.putLong("totalBytes", update.totalBytes)
+            sendEvent("onPayloadTransferUpdate", params)
         }
     }
 
     private val connectionLifecycleCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
-            // A connection was initiated
+            val params = Arguments.createMap()
+            params.putString("endpointId", endpointId)
+            params.putString("endpointName", connectionInfo.endpointName)
+            params.putString("authenticationToken", connectionInfo.authenticationToken)
+            params.putBoolean("isIncomingConnection", connectionInfo.isIncomingConnection)
+            sendEvent("onConnectionInitiated", params)
         }
 
         override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
-            // The result of a connection attempt
+            val params = Arguments.createMap()
+            params.putString("endpointId", endpointId)
+            params.putString("status", result.status.statusMessage)
+            params.putInt("statusCode", result.status.statusCode)
+            
+            if (result.status.isSuccess) {
+                sendEvent("onConnectionEstablished", params)
+            } else {
+                sendEvent("onConnectionFailed", params)
+            }
         }
 
         override fun onDisconnected(endpointId: String) {
-            // An endpoint was disconnected
+            val params = Arguments.createMap()
+            params.putString("endpointId", endpointId)
+            sendEvent("onDisconnected", params)
         }
     }
 }

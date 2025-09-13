@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import Apu from './src/App.tsx';
 
 export default function App() {
   const [phone, setPhone] = useState('+91'); // enter full E.164, e.g., +919876543210
-  const [confirm, setConfirm] = useState<FirebaseAuthTypes.ConfirmationResult | null>(null);
+  const [confirm, setConfirm] =
+    useState<FirebaseAuthTypes.ConfirmationResult | null>(null);
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
@@ -17,7 +28,10 @@ export default function App() {
   const sendCode = async () => {
     const p = phone.trim();
     if (!/^\+\d{7,15}$/.test(p)) {
-      Alert.alert('Invalid phone', 'Enter number in E.164 format, e.g., +919876543210');
+      Alert.alert(
+        'Invalid phone',
+        'Enter number in E.164 format, e.g., +919876543210',
+      );
       return;
     }
     setLoading(true);
@@ -69,6 +83,7 @@ export default function App() {
   if (user) {
     return (
       <SafeAreaView style={styles.container}>
+        <Apu />
         <Text style={styles.title}>Signed in</Text>
         <Text style={{ marginBottom: 16 }}>{user.phoneNumber}</Text>
         <TouchableOpacity style={styles.button} onPress={signOut}>
@@ -110,7 +125,10 @@ export default function App() {
           <TouchableOpacity style={styles.button} onPress={verifyCode}>
             <Text style={styles.btnText}>Verify & Sign in</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#6b7280' }]} onPress={() => setConfirm(null)}>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: '#6b7280' }]}
+            onPress={() => setConfirm(null)}
+          >
             <Text style={styles.btnText}>Change number</Text>
           </TouchableOpacity>
         </>
@@ -123,7 +141,19 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, justifyContent: 'center' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 12 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12 },
-  button: { backgroundColor: '#111827', paddingVertical: 12, alignItems: 'center', borderRadius: 8, marginBottom: 8 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  button: {
+    backgroundColor: '#111827',
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
   btnText: { color: '#fff', fontWeight: '600' },
 });

@@ -46,6 +46,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				    "NearbyConnection.swift",
+				    "NearbyConnection.m",
+				    "NearbyConnection-Bridging-Header.h"
 			);
 			name = ResQNetApp;
 			sourceTree = "<group>";
@@ -245,6 +248,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				    "NearbyConnection.swift in Sources",
+				    "NearbyConnection.m in Sources",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +281,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+				    SWIFT_OBJC_BRIDGING_HEADER = "NearbyConnection-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -302,6 +308,7 @@
 				PRODUCT_NAME = ResQNetApp;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+				    SWIFT_OBJC_BRIDGING_HEADER = "NearbyConnection-Bridging-Header.h";
 			};
 			name = Release;
 		};

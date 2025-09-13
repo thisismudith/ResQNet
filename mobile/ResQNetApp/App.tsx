@@ -5,8 +5,15 @@
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  StatusBar,
+  StyleSheet,
+  useColorScheme,
+  View,
+  Text,
+  Button,
+} from 'react-native';
+
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -28,10 +35,9 @@ function AppContent() {
 
   return (
     <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
+      <Button title="Discover Peers" />
+      <Text>Check console for nearby devices and connection info</Text>
+      <Text>Fuck You</Text>
     </View>
   );
 }

@@ -52,6 +52,7 @@ export default function Apu() {
     const onEndpointFound = eventEmitter.addListener(
       'onEndpointFound',
       (device: Device) => {
+        console.log('Found device:', device);
         setDevices(prevDevices => {
           const exists = prevDevices.some(
             d => d.endpointId === device.endpointId,
@@ -66,6 +67,7 @@ export default function Apu() {
     const onEndpointLost = eventEmitter.addListener(
       'onEndpointLost',
       (device: { endpointId: string }) => {
+        console.log('Lost device:', device);
         setDevices(prevDevices =>
           prevDevices.filter(d => d.endpointId !== device.endpointId),
         );
@@ -76,6 +78,8 @@ export default function Apu() {
     const onConnectionInitiated = eventEmitter.addListener(
       'onConnectionInitiated',
       (data: ConnectionRequest) => {
+        console.log('Connection initiated:', data);
+        NearbyConnection.acceptConnection(data.endpointId);
         if (data.isIncomingConnection) {
           setConnectionRequests(prev => [...prev, data]);
         }
@@ -166,23 +170,8 @@ export default function Apu() {
       },
     );
 
-    // Discovery/Advertising events
-    const onDiscoveryStarted = eventEmitter.addListener(
-      'onDiscoveryStarted',
-      () => console.log('Discovery started successfully'),
-    );
-
-    const onAdvertisingStarted = eventEmitter.addListener(
-      'onAdvertisingStarted',
-      () => console.log('Advertising started successfully'),
-    );
-
-    const onConnectionRequested = eventEmitter.addListener(
-      'onConnectionRequested',
-      (data: { endpointId: string }) => {
-        console.log('Connection requested to:', data.endpointId);
-      },
-    );
+    startDiscovery(); // Automatically start discovery on mount
+    window.Hell = NearbyConnection;
 
     return () => {
       onEndpointFound.remove();
@@ -194,21 +183,18 @@ export default function Apu() {
       onMessageReceived.remove();
       onMessageSent.remove();
       onMessageSendFailed.remove();
-      onDiscoveryStarted.remove();
-      onAdvertisingStarted.remove();
-      onConnectionRequested.remove();
+      stopDiscovery();
     };
   }, []);
 
   const requestPermissions = async () => {
     if (Platform.OS === 'android') {
       try {
-        console.log(PermissionsAndroid.PERMISSIONS);
         const granted = await PermissionsAndroid.requestMultiple([
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES,
         ]);
-        console.log(granted);
+        console.log('Permissions result:', granted);
         if (
           granted['android.permission.ACCESS_FINE_LOCATION'] ===
             PermissionsAndroid.RESULTS.GRANTED &&
@@ -233,33 +219,24 @@ export default function Apu() {
     const hasPermissions = await requestPermissions();
     if (hasPermissions) {
       setIsDiscovering(true);
-      NearbyConnection.startDiscovery();
+      NearbyConnection.startDiscovering();
       console.log('Starting discovery...');
+    } else {
+      Alert.alert(
+        'Permissions required',
+        'Cannot start discovery without required permissions.',
+      );
     }
   };
 
   const stopDiscovery = () => {
     setIsDiscovering(false);
-    NearbyConnection.stopDiscovery();
+    NearbyConnection.stopDiscovering();
     console.log('Stopping discovery...');
   };
 
-  const startAdvertising = async () => {
-    const hasPermissions = await requestPermissions();
-    if (hasPermissions) {
-      setIsAdvertising(true);
-      NearbyConnection.startAdvertising();
-      console.log('Starting advertising...');
-    }
-  };
-
-  const stopAdvertising = () => {
-    setIsAdvertising(false);
-    NearbyConnection.stopAdvertising();
-    console.log('Stopping advertising...');
-  };
-
   const connectToDevice = (device: Device) => {
+    Alert.alert('Connecting to ' + device.name);
     NearbyConnection.connectToEndpoint(device.endpointId);
   };
 
@@ -305,16 +282,10 @@ export default function Apu() {
 
       {/* Control Buttons */}
       <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-        <View style={{ flex: 1, marginRight: 10 }}>
+        <View style={{ flex: 1 }}>
           <Button
             title={isDiscovering ? 'Stop Discovery' : 'Start Discovery'}
             onPress={isDiscovering ? stopDiscovery : startDiscovery}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Button
-            title={isAdvertising ? 'Stop Advertising' : 'Start Advertising'}
-            onPress={isAdvertising ? stopAdvertising : startAdvertising}
           />
         </View>
       </View>

@@ -19,8 +19,7 @@ Connecting lives when network fails. A disaster management and rescuing app usin
 4. [Usage](#usage)
     - [The video](#the-video)
     - [Snapshots](#snapshots)
-5. [License](#license)
-6. [Contributors](#contributors)
+5. [Contributors](#contributors)
 
 </details>
 
@@ -122,12 +121,6 @@ Alerts
 ![User Settings](images/user.jpg)
 
 User Settings
-
-
-## License
-
-This repository is licensed under the MIT license, which you can find in the LICENSE file.
-
 
 ## Contributors
 

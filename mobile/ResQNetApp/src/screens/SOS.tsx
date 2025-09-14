@@ -217,7 +217,14 @@ export default function SOS() {
             </Text>
           </View>
           <Pressable
-            onPress={CoreAPI.fetchLocation}
+            onPress={() => {
+              CoreAPI.fetchLocation();
+              setLocationLine(
+                CoreAPI.geoY != null && CoreAPI.geoX != null
+                  ? `${CoreAPI.geoY.toFixed(5)}, ${CoreAPI.geoX.toFixed(5)}`
+                  : 'Fetching location...',
+              );
+            }}
             style={({ pressed }) => [
               styles.smallBtn,
               pressed ? styles.smallBtnPressed : styles.smallBtn,

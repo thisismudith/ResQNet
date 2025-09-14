@@ -16,6 +16,9 @@ import { useNavigation } from '@react-navigation/native';
 import Core from '../core.ts';
 =======
 import Core from '../core';
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -65,6 +68,7 @@ export default function SOS() {
     const [geoY, setGeoY] = useState<number | null>(null);
     const [geoTimestamp, setGeoTimestamp] = useState<number | null>(null);
     const [location, setLocation] = useState<string | null>(null);
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     const [locationLine, setLocationLine] = useState('Fetching location...');
 
@@ -120,6 +124,40 @@ export default function SOS() {
   
 =======
 >>>>>>> Stashed changes
+=======
+
+    // chip selection
+    const [selected, setSelected] = useState<ChipDef | null>(null);
+    const selectChip = (c: ChipDef) => setSelected(c);
+
+    // Arm / cancel logic
+    const [isArmed, setIsArmed] = useState(false);
+    const [isArming, setIsArming] = useState(false);
+    const [remainingMs, setRemainingMs] = useState(HOLD_MS);
+    const armTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const tickRef = useRef<NodeJS.Timeout | null>(null);
+
+    const activateSOS = () => {
+        const key = selected?.key ?? 'unspecified';
+        // Alert.alert('SOS sent', `SOS initiated for: ${key}`);
+        // reset state after send
+        setIsArming(false);
+        setRemainingMs(HOLD_MS);
+        setIsArmed(true);
+    };
+
+    const deactivateSOS = () => {
+        // Alert.alert('SOS cancelled', `SOS cancelled`);
+        setIsArmed(false);
+    };
+
+    useEffect(() => {
+        if (isArmed) CoreAPI.start();
+        else CoreAPI.stop();
+
+        // return () => CoreAPI.cleanup();
+    }, [isArmed]);
+>>>>>>> Stashed changes
     const refreshFromCore = async () => {
         await CoreAPI.fetchLocation();
         setGeoX(typeof CoreAPI.geoX === 'number' ? CoreAPI.geoX : null);
@@ -127,10 +165,13 @@ export default function SOS() {
         setGeoTimestamp(typeof CoreAPI.timestamp === 'number' ? CoreAPI.timestamp : null);
         setLocation(typeof CoreAPI.location === 'string' ? CoreAPI.location : null);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         
         setLocationLine(geoY != null && geoX != null
           ? `${geoY.toFixed(5)}, ${geoX.toFixed(5)}`
           : 'Fetching location...');
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     };
@@ -143,6 +184,7 @@ export default function SOS() {
         armTimeoutRef.current = null;
         }
         if (tickRef.current) {
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         clearInterval(tickRef.current);
         tickRef.current = null;
@@ -157,6 +199,8 @@ export default function SOS() {
     armTimeoutRef.current = setTimeout(() => {
       armTimeoutRef.current = null;
       if (tickRef.current) {
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         clearInterval(tickRef.current);
@@ -200,6 +244,7 @@ export default function SOS() {
     // cleanup timers on unmount / nav away
     useEffect(() => () => cancelArming(), []);
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
     return (
@@ -271,6 +316,45 @@ export default function SOS() {
       ? `${geoY.toFixed(5)}, ${geoX.toFixed(5)}`
       : 'Fetching location...';
 
+=======
+    // pulse animation while arming
+    const pulse = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+        if (isArming || isArmed) {
+        const loop = Animated.loop(
+            Animated.sequence([
+            Animated.timing(pulse, {
+                toValue: 1,
+                duration: isArmed ? 250 : 500,
+                useNativeDriver: true,
+            }),
+            Animated.timing(pulse, {
+                toValue: 0,
+                duration: isArmed ? 250 : 500,
+                useNativeDriver: true,
+            }),
+            ]),
+        );
+        loop.start();
+        return () => loop.stop();
+        } else {
+        pulse.stopAnimation();
+        pulse.setValue(0);
+        }
+    }, [isArming, isArmed, pulse]);
+    const scalePulse = pulse.interpolate({
+        inputRange: [0, 1],
+        outputRange: [1, 1.05],
+    });
+
+    const secondsLeft = Math.ceil(remainingMs / 1000);
+
+    const locationLine =
+    geoY != null && geoX != null
+      ? `${geoY.toFixed(5)}, ${geoX.toFixed(5)}`
+      : 'Fetching location...';
+
+>>>>>>> Stashed changes
     return (
         <SafeAreaView edges={['top']} style={styles.safe}>
         <ScrollView
@@ -468,7 +552,11 @@ const styles = StyleSheet.create({
   smallBtnPressed: {
     backgroundColor: '#f3f4f6',
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   },
+=======
+    },
+>>>>>>> Stashed changes
 =======
     },
 >>>>>>> Stashed changes

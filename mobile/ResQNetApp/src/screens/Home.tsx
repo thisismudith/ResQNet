@@ -7,6 +7,10 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../app/navigation/types';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+import Geolocation from '@react-native-community/geolocation';
+>>>>>>> Stashed changes
 =======
 import Geolocation from '@react-native-community/geolocation';
 >>>>>>> Stashed changes
@@ -24,6 +28,9 @@ export default function HomeScreen() {
       Alert.alert(position.coords.longitude.toString(), position.coords.latitude.toString());
     }
   )
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
   const handleSignOut = async () => {

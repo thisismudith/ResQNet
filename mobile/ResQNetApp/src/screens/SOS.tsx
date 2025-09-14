@@ -62,16 +62,19 @@ export default function SOS() {
     const [geoTimestamp, setGeoTimestamp] = useState<number | null>(null);
     const [location, setLocation] = useState<string | null>(null);
 
-    // chip selection
-    const [selected, setSelected] = useState<ChipDef | null>(null);
-    const selectChip = (c: ChipDef) => setSelected(c);
-
     // Arm / cancel logic
     const [isArmed, setIsArmed] = useState(false);
     const [isArming, setIsArming] = useState(false);
     const [remainingMs, setRemainingMs] = useState(HOLD_MS);
     const armTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const tickRef = useRef<NodeJS.Timeout | null>(null);
+
+    // chip selection
+    const [selected, setSelected] = useState<ChipDef | null>(null);
+    const selectChip = (c: ChipDef) => {
+        if (!isArmed && !isArming) setSelected(c);
+    };
+
 
     const activateSOS = () => {
         const key = selected?.key ?? 'unspecified';

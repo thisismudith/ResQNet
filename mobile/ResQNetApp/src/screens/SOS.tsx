@@ -129,7 +129,16 @@ export default function SOS() {
     // chip selection
     const [selected, setSelected] = useState<ChipDef | null>(null);
     const selectChip = (c: ChipDef) => setSelected(c);
+    // chip selection
+    const [selected, setSelected] = useState<ChipDef | null>(null);
+    const selectChip = (c: ChipDef) => setSelected(c);
 
+    // Arm / cancel logic
+    const [isArmed, setIsArmed] = useState(false);
+    const [isArming, setIsArming] = useState(false);
+    const [remainingMs, setRemainingMs] = useState(HOLD_MS);
+    const armTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const tickRef = useRef<NodeJS.Timeout | null>(null);
     // Arm / cancel logic
     const [isArmed, setIsArmed] = useState(false);
     const [isArming, setIsArming] = useState(false);
@@ -145,12 +154,27 @@ export default function SOS() {
         setRemainingMs(HOLD_MS);
         setIsArmed(true);
     };
+    const activateSOS = () => {
+        const key = selected?.key ?? 'unspecified';
+        // Alert.alert('SOS sent', `SOS initiated for: ${key}`);
+        // reset state after send
+        setIsArming(false);
+        setRemainingMs(HOLD_MS);
+        setIsArmed(true);
+    };
 
     const deactivateSOS = () => {
         // Alert.alert('SOS cancelled', `SOS cancelled`);
         setIsArmed(false);
     };
+    const deactivateSOS = () => {
+        // Alert.alert('SOS cancelled', `SOS cancelled`);
+        setIsArmed(false);
+    };
 
+    useEffect(() => {
+        if (isArmed) CoreAPI.start();
+        else CoreAPI.stop();
     useEffect(() => {
         if (isArmed) CoreAPI.start();
         else CoreAPI.stop();
@@ -212,6 +236,10 @@ export default function SOS() {
         setIsArming(true);
         setRemainingMs(HOLD_MS);
         const start = Date.now();
+    const startArming = () => {
+        setIsArming(true);
+        setRemainingMs(HOLD_MS);
+        const start = Date.now();
 
         armTimeoutRef.current = setTimeout(() => {
         armTimeoutRef.current = null;
@@ -221,7 +249,21 @@ export default function SOS() {
         }
         activateSOS();
         }, HOLD_MS);
+        armTimeoutRef.current = setTimeout(() => {
+        armTimeoutRef.current = null;
+        if (tickRef.current) {
+            clearInterval(tickRef.current);
+            tickRef.current = null;
+        }
+        activateSOS();
+        }, HOLD_MS);
 
+        tickRef.current = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const left = Math.max(0, HOLD_MS - elapsed);
+        setRemainingMs(left);
+        }, 100);
+    };
         tickRef.current = setInterval(() => {
         const elapsed = Date.now() - start;
         const left = Math.max(0, HOLD_MS - elapsed);
@@ -240,7 +282,20 @@ export default function SOS() {
         startArming();
         }
     };
+    // toggle on tap
+    const onPressSOS = () => {
+        if (isArmed) {
+        deactivateSOS();
+        } else if (isArming) {
+        // second press within 3s -> cancel
+        cancelArming();
+        } else {
+        startArming();
+        }
+    };
 
+    // cleanup timers on unmount / nav away
+    useEffect(() => () => cancelArming(), []);
     // cleanup timers on unmount / nav away
     useEffect(() => () => cancelArming(), []);
 
@@ -348,6 +403,7 @@ export default function SOS() {
     });
 
     const secondsLeft = Math.ceil(remainingMs / 1000);
+    const secondsLeft = Math.ceil(remainingMs / 1000);
 
     const locationLine =
     geoY != null && geoX != null
@@ -410,7 +466,51 @@ export default function SOS() {
                 )}
             </Pressable>
             </View>
+            {/* Big SOS button */}
+            <View style={styles.sosWrap}>
+            <Animated.View
+                style={[
+                styles.ringOuter,
+                { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
+                ]}
+            />
+            <Animated.View
+                style={[
+                styles.ringMid,
+                { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
+                ]}
+            />
+            <Pressable
+                onPress={onPressSOS}
+                style={styles.sosCore}
+                android_disableSound
+            >
+                <Text style={styles.sosText}>{isArmed ? 'ARMED!!' : 'SOS'}</Text>
+                <Text style={styles.sosHint}>
+                {isArming
+                    ? `Sending in ${secondsLeft}s • Tap to Cancel`
+                    : isArmed
+                    ? 'Keep tight! Help is on the way'
+                    : 'Tap to Send'}
+                </Text>
+                {selected && (
+                <Text style={styles.selectedHint}>for: {selected.label}</Text>
+                )}
+            </Pressable>
+            </View>
 
+            {/* Main emergencies */}
+            <Text style={styles.groupTitle}>What’s your emergency?</Text>
+            <View style={styles.chips}>
+            {MAIN_EMERGENCIES.map(c => (
+                <Chip
+                key={c.key}
+                data={c}
+                selected={selected?.key === c.key}
+                onSelect={selectChip}
+                />
+            ))}
+            </View>
             {/* Main emergencies */}
             <Text style={styles.groupTitle}>What’s your emergency?</Text>
             <View style={styles.chips}>
@@ -438,6 +538,20 @@ export default function SOS() {
                 />
             ))}
             </View>
+            {/* Side emergencies */}
+            <Text style={[styles.groupTitle, { marginTop: 14 }]}>
+            Something else?
+            </Text>
+            <View style={styles.chips}>
+            {OTHER_CHIPS.map(c => (
+                <Chip
+                key={c.key}
+                data={c}
+                selected={selected?.key === c.key}
+                onSelect={selectChip}
+                />
+            ))}
+            </View>
 
             {/* Go back -> Home */}
             <Pressable
@@ -451,7 +565,23 @@ export default function SOS() {
             >
             <Text style={styles.backText}>← Go back</Text>
             </Pressable>
+            {/* Go back -> Home */}
+            <Pressable
+            onPress={() =>
+                navigation.reset({
+                index: 0,
+                routes: [{ name: 'TopTabs', params: { screen: 'Home' } }],
+                })
+            }
+            style={styles.backLink}
+            >
+            <Text style={styles.backText}>← Go back</Text>
+            </Pressable>
 
+            <View style={{ height: 16 }} />
+        </ScrollView>
+        </SafeAreaView>
+    );
             <View style={{ height: 16 }} />
         </ScrollView>
         </SafeAreaView>
@@ -539,6 +669,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   locTitle: { fontWeight: '700', color: COLORS.text, marginBottom: 4 },
+  locText: { color: COLORS.sub, maxWidth: '70%' },
   locText: { color: COLORS.sub, maxWidth: '70%' },
 
   smallBtn: {

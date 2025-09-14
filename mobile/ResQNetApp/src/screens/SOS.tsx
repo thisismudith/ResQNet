@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import Core from '../core';
+import Core from '../core.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const COLORS = {
@@ -71,30 +71,29 @@ export default function SOS() {
     const tickRef = useRef<NodeJS.Timeout | null>(null);
  
 
-    // chip selection
-    const [selected, setSelected] = useState<ChipDef | null>(null);
-    const selectChip = (c: ChipDef) => {
-        if (!isArmed && !isArming) setSelected(c);
-    };
+  // chip selection
+  const [selected, setSelected] = useState<ChipDef | null>(null);
+  const selectChip = (c: ChipDef) => {
+    if (!isArmed && !isArming) setSelected(c);
+  };
 
+  const activateSOS = () => {
+    const key = selected?.key ?? 'unspecified';
+    // Alert.alert('SOS sent', `SOS initiated for: ${key}`);
+    // reset state after send
+    setIsArming(false);
+    setRemainingMs(HOLD_MS);
+    setIsArmed(true);
+  };
 
-    const activateSOS = () => {
-        const key = selected?.key ?? 'unspecified';
-        // Alert.alert('SOS sent', `SOS initiated for: ${key}`);
-        // reset state after send
-        setIsArming(false);
-        setRemainingMs(HOLD_MS);
-        setIsArmed(true);
-    };
+  const deactivateSOS = () => {
+    // Alert.alert('SOS cancelled', `SOS cancelled`);
+    setIsArmed(false);
+  };
 
-    const deactivateSOS = () => {
-        // Alert.alert('SOS cancelled', `SOS cancelled`);
-        setIsArmed(false);
-    };
-
-    useEffect(() => {
-        if (isArmed) CoreAPI.start();
-        else CoreAPI.stop();
+  useEffect(() => {
+    if (isArmed) CoreAPI.start();
+    else CoreAPI.stop();
 
         // return () => CoreAPI.cleanup();
     }, [isArmed]);
@@ -125,73 +124,73 @@ export default function SOS() {
         }
     };
 
-    const startArming = () => {
-        setIsArming(true);
-        setRemainingMs(HOLD_MS);
-        const start = Date.now();
+  const startArming = () => {
+    setIsArming(true);
+    setRemainingMs(HOLD_MS);
+    const start = Date.now();
 
-        armTimeoutRef.current = setTimeout(() => {
-        armTimeoutRef.current = null;
-        if (tickRef.current) {
-            clearInterval(tickRef.current);
-            tickRef.current = null;
-        }
-        activateSOS();
-        }, HOLD_MS);
+    armTimeoutRef.current = setTimeout(() => {
+      armTimeoutRef.current = null;
+      if (tickRef.current) {
+        clearInterval(tickRef.current);
+        tickRef.current = null;
+      }
+      activateSOS();
+    }, HOLD_MS);
 
-        tickRef.current = setInterval(() => {
-        const elapsed = Date.now() - start;
-        const left = Math.max(0, HOLD_MS - elapsed);
-        setRemainingMs(left);
-        }, 100);
-    };
+    tickRef.current = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const left = Math.max(0, HOLD_MS - elapsed);
+      setRemainingMs(left);
+    }, 100);
+  };
 
-    // toggle on tap
-    const onPressSOS = () => {
-        if (isArmed) {
-        deactivateSOS();
-        } else if (isArming) {
-        // second press within 3s -> cancel
-        cancelArming();
-        } else {
-        startArming();
-        }
-    };
+  // toggle on tap
+  const onPressSOS = () => {
+    if (isArmed) {
+      deactivateSOS();
+    } else if (isArming) {
+      // second press within 3s -> cancel
+      cancelArming();
+    } else {
+      startArming();
+    }
+  };
 
-    // cleanup timers on unmount / nav away
-    useEffect(() => () => cancelArming(), []);
+  // cleanup timers on unmount / nav away
+  useEffect(() => () => cancelArming(), []);
 
-    // pulse animation while arming
-    const pulse = useRef(new Animated.Value(0)).current;
-    useEffect(() => {
-        if (isArming || isArmed) {
-        const loop = Animated.loop(
-            Animated.sequence([
-            Animated.timing(pulse, {
-                toValue: 1,
-                duration: isArmed ? 250 : 500,
-                useNativeDriver: true,
-            }),
-            Animated.timing(pulse, {
-                toValue: 0,
-                duration: isArmed ? 250 : 500,
-                useNativeDriver: true,
-            }),
-            ]),
-        );
-        loop.start();
-        return () => loop.stop();
-        } else {
-        pulse.stopAnimation();
-        pulse.setValue(0);
-        }
-    }, [isArming, isArmed, pulse]);
-    const scalePulse = pulse.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 1.05],
-    });
+  // pulse animation while arming
+  const pulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (isArming || isArmed) {
+      const loop = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulse, {
+            toValue: 1,
+            duration: isArmed ? 250 : 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulse, {
+            toValue: 0,
+            duration: isArmed ? 250 : 500,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+      loop.start();
+      return () => loop.stop();
+    } else {
+      pulse.stopAnimation();
+      pulse.setValue(0);
+    }
+  }, [isArming, isArmed, pulse]);
+  const scalePulse = pulse.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.05],
+  });
 
-    const secondsLeft = Math.ceil(remainingMs / 1000);
+  const secondsLeft = Math.ceil(remainingMs / 1000);
 
 
     return (
@@ -205,96 +204,104 @@ export default function SOS() {
             <Text style={styles.sub}> Tap SOS to arm. It will send in 3 seconds. Tap again to cancel before it sends.</Text>
 
 
-            {/* Location card (wired to CORE) */}
-            <View style={styles.locCard}>
-                <Ionicons name="location-sharp" size={20} color={COLORS.ringCore} />
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.locTitle}>Your Location</Text>
-                    <Text style={styles.locText} numberOfLines={1}>{locationLine}</Text>
-                </View>
-                <Pressable onPress={refreshFromCore} style={({ pressed }) => [ styles.smallBtn, pressed ? styles.smallBtnPressed : styles.smallBtn, ]}>
-                    <Text style={styles.smallBtnText}>Refresh</Text>
-                </Pressable>
-            </View>
-
-            {/* Big SOS button */}
-            <View style={styles.sosWrap}>
-            <Animated.View
-                style={[
-                styles.ringOuter,
-                { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
-                ]}
-            />
-            <Animated.View
-                style={[
-                styles.ringMid,
-                { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
-                ]}
-            />
-            <Pressable
-                onPress={onPressSOS}
-                style={styles.sosCore}
-                android_disableSound
-            >
-                <Text style={styles.sosText}>{isArmed ? 'ARMED!!' : 'SOS'}</Text>
-                <Text style={styles.sosHint}>
-                {isArming
-                    ? `Sending in ${secondsLeft}s • Tap to Cancel`
-                    : isArmed
-                    ? 'Keep tight! Help is on the way'
-                    : 'Tap to Send'}
-                </Text>
-                {selected && (
-                <Text style={styles.selectedHint}>for: {selected.label}</Text>
-                )}
-            </Pressable>
-            </View>
-
-            {/* Main emergencies */}
-            <Text style={styles.groupTitle}>What’s your emergency?</Text>
-            <View style={styles.chips}>
-            {MAIN_EMERGENCIES.map(c => (
-                <Chip
-                key={c.key}
-                data={c}
-                selected={selected?.key === c.key}
-                onSelect={selectChip}
-                />
-            ))}
-            </View>
-
-            {/* Side emergencies */}
-            <Text style={[styles.groupTitle, { marginTop: 14 }]}>
-            Something else?
+        {/* Location card (wired to CORE) */}
+        <View style={styles.locCard}>
+          <Ionicons name="location-sharp" size={20} color={COLORS.ringCore} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.locTitle}>Your Location</Text>
+            <Text style={styles.locText} numberOfLines={1}>
+              {CoreAPI.geoX}, {CoreAPI.geoY}
             </Text>
-            <View style={styles.chips}>
-            {OTHER_CHIPS.map(c => (
-                <Chip
-                key={c.key}
-                data={c}
-                selected={selected?.key === c.key}
-                onSelect={selectChip}
-                />
-            ))}
-            </View>
+          </View>
+          <Pressable
+            onPress={CoreAPI.fetchLocation}
+            style={({ pressed }) => [
+              styles.smallBtn,
+              pressed ? styles.smallBtnPressed : styles.smallBtn,
+            ]}
+          >
+            <Text style={styles.smallBtnText}>Refresh</Text>
+          </Pressable>
+        </View>
 
-            {/* Go back -> Home */}
-            <Pressable
-            onPress={() =>
-                navigation.reset({
-                index: 0,
-                routes: [{ name: 'TopTabs', params: { screen: 'Home' } }],
-                })
-            }
-            style={styles.backLink}
-            >
-            <Text style={styles.backText}>← Go back</Text>
-            </Pressable>
+        {/* Big SOS button */}
+        <View style={styles.sosWrap}>
+          <Animated.View
+            style={[
+              styles.ringOuter,
+              { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.ringMid,
+              { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
+            ]}
+          />
+          <Pressable
+            onPress={onPressSOS}
+            style={styles.sosCore}
+            android_disableSound
+          >
+            <Text style={styles.sosText}>{isArmed ? 'ARMED!!' : 'SOS'}</Text>
+            <Text style={styles.sosHint}>
+              {isArming
+                ? `Sending in ${secondsLeft}s • Tap to Cancel`
+                : isArmed
+                ? 'Keep tight! Help is on the way'
+                : 'Tap to Send'}
+            </Text>
+            {selected && (
+              <Text style={styles.selectedHint}>for: {selected.label}</Text>
+            )}
+          </Pressable>
+        </View>
 
-            <View style={{ height: 16 }} />
-        </ScrollView>
-        </SafeAreaView>
-    );
+        {/* Main emergencies */}
+        <Text style={styles.groupTitle}>What’s your emergency?</Text>
+        <View style={styles.chips}>
+          {MAIN_EMERGENCIES.map(c => (
+            <Chip
+              key={c.key}
+              data={c}
+              selected={selected?.key === c.key}
+              onSelect={selectChip}
+            />
+          ))}
+        </View>
+
+        {/* Side emergencies */}
+        <Text style={[styles.groupTitle, { marginTop: 14 }]}>
+          Something else?
+        </Text>
+        <View style={styles.chips}>
+          {OTHER_CHIPS.map(c => (
+            <Chip
+              key={c.key}
+              data={c}
+              selected={selected?.key === c.key}
+              onSelect={selectChip}
+            />
+          ))}
+        </View>
+
+        {/* Go back -> Home */}
+        <Pressable
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'TopTabs', params: { screen: 'Home' } }],
+            })
+          }
+          style={styles.backLink}
+        >
+          <Text style={styles.backText}>← Go back</Text>
+        </Pressable>
+
+        <View style={{ height: 16 }} />
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 function Chip({
@@ -390,7 +397,7 @@ const styles = StyleSheet.create({
   },
   smallBtnPressed: {
     backgroundColor: '#f3f4f6',
-    },
+  },
   smallBtnText: { fontWeight: '800', color: COLORS.text },
 
   sosWrap: {

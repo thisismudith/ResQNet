@@ -13,5 +13,5 @@ export type TopTabParamList = {
   Home: undefined;
   Guidelines: undefined;
   Alerts: undefined;
-  MyNetwork: undefined;
+  UserScreen: undefined;
 };

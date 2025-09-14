@@ -1,0 +1,72 @@
+import Geolocation from '@react-native-community/geolocation';
+
+export default class CORE {
+  constructor(parameters) {
+    this.geoX = 0;
+    this.geoY = 0;
+    this.timestamp = 0;
+    this.location = ''; // Human readable location
+
+    this.isActive = false;
+
+    this.devices = []; // Nearby devices...
+    this.connectionRequests = [];
+  }
+
+  initialize() {
+    // Setup all the subscriptions...
+    // Setup all the discovery...
+  }
+
+  start() {
+    this.isActive = true;
+    // Start Advertising
+  }
+
+  stop() {
+    this.isActive = false;
+    // Stop Advertising
+  }
+
+  wait_interval() {
+    // Calculating how much time we wait before broadcasting location again
+    // 5s - delta (location) <- The more the location changes, the more often we broadcast
+    // Min interval is .1s, max is 5s
+  }
+
+  toInternet() {
+    // Send location + message to server...
+    // Returns wheter the attempt was successfull.
+  }
+
+  broadcast() {
+    // Loop through our connections and broadcast our location + received message to each connection.
+    // Only called if toInternet() fails.
+  }
+
+  fetchLocation() {
+    // Get location code...
+    Geolocation.getCurrentPosition(
+      pos => {
+        this.geoX = pos.coords.longitude;
+        this.geoY = pos.coords.latitude;
+        this.timestamp = pos.timestamp
+      },
+      error => {
+        this.timestamp = 0;
+        console.error('Error fetching location:', error);
+      },
+    );
+  }
+
+  handleConnection() {
+    // This is where we handle the code for connections from phones
+    // If the code is active and we receive a connection, auto accept.
+    // If not active, send a notification to the user.
+  }
+
+  cleanup() {
+    this.subscriptions.forEach(s => s.remove());
+    this.stopDiscovery();
+  }
+}

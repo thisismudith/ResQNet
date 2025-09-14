@@ -40,6 +40,8 @@ export default class CORE {
   onDevicesChanged?: ListenerFn<Device[]>;
   onRequestsChanged?: ListenerFn<ConnectionRequest[]>;
   onMessagesChanged?: ListenerFn<Message[]>;
+    location: any;
+    timestamp: any;
 
   constructor() {
     this.geoX = 0;

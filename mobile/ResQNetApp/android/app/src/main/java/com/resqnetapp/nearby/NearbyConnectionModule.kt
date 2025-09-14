@@ -55,7 +55,8 @@ class NearbyConnectionModule(reactContext: ReactApplicationContext) : ReactConte
      * Starts advertising the device to nearby peers. This is now an internal function
      * called automatically by startDiscovering.
      */
-    private fun startAdvertising() {
+	@ReactMethod
+    fun startAdvertising() {
         if (isAdvertising) {
             log("Already advertising.")
             return
@@ -99,9 +100,6 @@ class NearbyConnectionModule(reactContext: ReactApplicationContext) : ReactConte
             log("Already discovering. Call stopDiscovering() first.")
             return
         }
-        
-        // Automatically start advertising when discovery starts.
-        startAdvertising()
 
         isDiscovering = true
         discoveredEndpoints.clear()

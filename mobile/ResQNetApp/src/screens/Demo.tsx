@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   View,
   Button,
@@ -35,6 +36,7 @@ interface ConnectionRequest {
 }
 
 export default function Apu() {
+  const navigation = useNavigation<Nav>();
   const [devices, setDevices] = useState<Device[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [connectionRequests, setConnectionRequests] = useState<
@@ -220,6 +222,7 @@ export default function Apu() {
     if (hasPermissions) {
       setIsDiscovering(true);
       NearbyConnection.startDiscovering();
+      NearbyConnection.startAdvertising();
       console.log('Starting discovery...');
     } else {
       Alert.alert(
@@ -281,11 +284,18 @@ export default function Apu() {
       </Text>
 
       {/* Control Buttons */}
+
       <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginRight: 10 }}>
           <Button
             title={isDiscovering ? 'Stop Discovery' : 'Start Discovery'}
             onPress={isDiscovering ? stopDiscovery : startDiscovery}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button
+            title={'Go Big Page'}
+            onPress={() => navigation.navigate('SOS')}
           />
         </View>
       </View>

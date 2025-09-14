@@ -61,6 +61,7 @@ export default function SOS() {
     const [geoY, setGeoY] = useState<number | null>(null);
     const [geoTimestamp, setGeoTimestamp] = useState<number | null>(null);
     const [location, setLocation] = useState<string | null>(null);
+    const [locationLine, setLocationLine] = useState('Fetching location...');
 
     // Arm / cancel logic
     const [isArmed, setIsArmed] = useState(false);
@@ -68,6 +69,7 @@ export default function SOS() {
     const [remainingMs, setRemainingMs] = useState(HOLD_MS);
     const armTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const tickRef = useRef<NodeJS.Timeout | null>(null);
+ 
 
     // chip selection
     const [selected, setSelected] = useState<ChipDef | null>(null);
@@ -96,12 +98,18 @@ export default function SOS() {
 
         // return () => CoreAPI.cleanup();
     }, [isArmed]);
+    
+  
     const refreshFromCore = async () => {
         await CoreAPI.fetchLocation();
         setGeoX(typeof CoreAPI.geoX === 'number' ? CoreAPI.geoX : null);
         setGeoY(typeof CoreAPI.geoY === 'number' ? CoreAPI.geoY : null);
         setGeoTimestamp(typeof CoreAPI.timestamp === 'number' ? CoreAPI.timestamp : null);
         setLocation(typeof CoreAPI.location === 'string' ? CoreAPI.location : null);
+        
+        setLocationLine(geoY != null && geoX != null
+          ? `${geoY.toFixed(5)}, ${geoX.toFixed(5)}`
+          : 'Fetching location...');
     };
     refreshFromCore();
     const cancelArming = () => {
@@ -185,10 +193,6 @@ export default function SOS() {
 
     const secondsLeft = Math.ceil(remainingMs / 1000);
 
-    const locationLine =
-    geoY != null && geoX != null
-      ? `${geoY.toFixed(5)}, ${geoX.toFixed(5)}`
-      : 'Fetching location...';
 
     return (
         <SafeAreaView edges={['top']} style={styles.safe}>

@@ -49,13 +49,13 @@ export default function UserScreen() {
         ]);
 
         // Prefer rescuer if both exist
-        if (rescSnap.exists) {
+        if (rescSnap.exists()) {
           setRole('rescuer');
           const data = rescSnap.data() || {};
           const n = (data.name as string) || '';
           setName(n);
           setInitialName(n);
-        } else if (recvSnap.exists) {
+        } else if (recvSnap.exists()) {
           setRole('receiver');
           const data = recvSnap.data() || {};
           const n = (data.name as string) || '';

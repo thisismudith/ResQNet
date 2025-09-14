@@ -14,7 +14,7 @@ import HomeScreen from '../../screens/Home';
 import Apu from '../../screens/Demo';
 import GuidelinesScreen from '../../screens/Guidelines';
 import AlertsScreen from '../../screens/Alerts';
-import MyNetworkScreen from '../../screens/MyNetwork';
+import UserScreen from '../../screens/User';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const ACTIVE = '#2b3342';
@@ -102,8 +102,8 @@ export default function TopTabsNavigator() {
           options={{ tabBarLabel: TabLabel('alert-circle', 'Alerts') }}
         />
         <Tab.Screen
-          name="MyNetwork"
-          component={MyNetworkScreen}
+          name="UserScreen"
+          component={UserScreen}
           options={{ tabBarLabel: TabLabel('person-circle', 'User') }}
         />
       </Tab.Navigator>

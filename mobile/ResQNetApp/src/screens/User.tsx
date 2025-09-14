@@ -102,7 +102,6 @@ export default function UserScreen() {
   const onSignOut = async () => {
     try {
       await auth().signOut();
-      nav.reset({ index: 0, routes: [{ name: 'Login' }] }); // adjust route name if needed
     } catch (e: any) {
       Alert.alert('Sign out failed', e?.message ?? String(e));
     }

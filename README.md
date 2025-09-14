@@ -1,6 +1,6 @@
-# The Never-Ending Loops
+# ResQNet
 
-Our loop-less (incomparable) repository for the [10th Python Discord Code Jam](https://www.pythondiscord.com/events/code-jams/10)
+Connecting lives when network fails. A disaster management and rescuing app using Mesh Networking.
 
 <details>
 <summary>Table of Contents</summary>
@@ -12,7 +12,7 @@ Our loop-less (incomparable) repository for the [10th Python Discord Code Jam](h
 2. [Features](#features)
     - [Offline SOS System](#offline-sos-system)
     - [Two-Way Communication](#two-way-communication)
-    - [Decryption](#decryption)
+    - [Alerts](#alerts)
 3. [Getting Started](#getting-started)
     - [Requirements](#requirements)
     - [Installation](#installation)
@@ -21,9 +21,6 @@ Our loop-less (incomparable) repository for the [10th Python Discord Code Jam](h
     - [Snapshots](#snapshots)
 5. [License](#license)
 6. [Contributors](#contributors)
-7. [Extras](#extras)
-    - [Stuff that went wrong, Stuff… (Behind The Codes)](#stuff-that-went-wrong-stuff-behind-the-codes)
-    - [Mind waving us a Hi on our Discord?](#mind-waving-us-a-hi-on-our-discord)
 
 </details>
 

@@ -2,26 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../ui/Button';
-import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../app/navigation/types';
-import Geolocation from '@react-native-community/geolocation';
 type Nav = NativeStackNavigationProp<AppStackParamList, 'TopTabs'>;
 
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
-  const handleSOS = () => {
-    Alert.alert('SOS', 'SOS pressed! (wire this to your real action)');
-  };
-  Geolocation.getCurrentPosition(
-    position => {
-      Alert.alert(position.coords.longitude.toString(), position.coords.latitude.toString());
-    }
-  )
-  const handleSignOut = async () => {
-    await auth().signOut();
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -35,12 +22,6 @@ export default function HomeScreen() {
           />
         </View>
         <Text style={{ marginTop: 16, opacity: 0.7 }}>You are signed in.</Text>
-        <Button
-          title="Sign out"
-          variant="secondary"
-          onPress={handleSignOut}
-          style={{ marginTop: 16 }}
-        />
       </View>
     </SafeAreaView>
   );

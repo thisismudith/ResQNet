@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../app/navigation/types.ts';
@@ -11,6 +11,7 @@ export default function LandingScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ alignItems: 'center', marginBottom: 16 }}>
+        <Image source={require('mobile\\ResQNetApp\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png')} style={{ width: 100, height: 100, marginBottom: 16 }} />
         <Text style={styles.title}>Welcome to ResQNet</Text>
         <Text style={{ opacity: 0.7, textAlign: 'center' }}>
           You're not signed in. Continue to login with your mobile number.

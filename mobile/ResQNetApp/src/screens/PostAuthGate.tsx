@@ -18,19 +18,7 @@ export default function PostAuthGate() {
         nav.reset({ index: 0, routes: [{ name: 'ProfileSetup' }] });
         return;
       }
-
-      const db = getFirestore();
-      const receiverRef = doc(db, 'receivers', key);
-      const rescuerRef  = doc(db, 'rescuers',  key);
-
-      // Check both in parallel; if either exists, skip setup
-      const [recvSnap, rescSnap] = await Promise.all([getDoc(receiverRef), getDoc(rescuerRef)]);
-
-      if (recvSnap.exists() || rescSnap.exists()) {
-        nav.reset({ index: 0, routes: [{ name: 'SOS' }] }); // or TopTabs/Home
-      } else {
-        nav.reset({ index: 0, routes: [{ name: 'ProfileSetup' }] });
-      }
+      nav.reset({ index: 0, routes: [{ name: 'SOS' }] });
     };
 
     run();

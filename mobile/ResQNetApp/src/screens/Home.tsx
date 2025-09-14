@@ -6,10 +6,25 @@ import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../app/navigation/types';
+<<<<<<< Updated upstream
+=======
+import Geolocation from '@react-native-community/geolocation';
+>>>>>>> Stashed changes
 type Nav = NativeStackNavigationProp<AppStackParamList, 'TopTabs'>;
 
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
+<<<<<<< Updated upstream
+=======
+  const handleSOS = () => {
+    Alert.alert('SOS', 'SOS pressed! (wire this to your real action)');
+  };
+  Geolocation.getCurrentPosition(
+    position => {
+      Alert.alert(position.coords.longitude.toString(), position.coords.latitude.toString());
+    }
+  )
+>>>>>>> Stashed changes
 
   const handleSignOut = async () => {
     await auth().signOut();

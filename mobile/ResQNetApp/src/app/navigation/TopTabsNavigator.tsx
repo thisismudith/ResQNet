@@ -88,7 +88,7 @@ export default function TopTabsNavigator() {
       >
         <Tab.Screen
           name="Home"
-          component={Apu}
+          component={HomeScreen}
           options={{ tabBarLabel: TabLabel('home', 'Home') }}
         />
         <Tab.Screen

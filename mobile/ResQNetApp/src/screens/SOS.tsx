@@ -12,7 +12,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+<<<<<<< Updated upstream
 import Core from '../core.ts';
+=======
+import Core from '../core';
+>>>>>>> Stashed changes
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const COLORS = {
@@ -61,6 +65,7 @@ export default function SOS() {
     const [geoY, setGeoY] = useState<number | null>(null);
     const [geoTimestamp, setGeoTimestamp] = useState<number | null>(null);
     const [location, setLocation] = useState<string | null>(null);
+<<<<<<< Updated upstream
     const [locationLine, setLocationLine] = useState('Fetching location...');
 
     // Arm / cancel logic
@@ -76,39 +81,58 @@ export default function SOS() {
   const selectChip = (c: ChipDef) => {
     if (!isArmed && !isArming) setSelected(c);
   };
+=======
 
-  const activateSOS = () => {
-    const key = selected?.key ?? 'unspecified';
-    // Alert.alert('SOS sent', `SOS initiated for: ${key}`);
-    // reset state after send
-    setIsArming(false);
-    setRemainingMs(HOLD_MS);
-    setIsArmed(true);
-  };
+    // chip selection
+    const [selected, setSelected] = useState<ChipDef | null>(null);
+    const selectChip = (c: ChipDef) => setSelected(c);
 
-  const deactivateSOS = () => {
-    // Alert.alert('SOS cancelled', `SOS cancelled`);
-    setIsArmed(false);
-  };
+    // Arm / cancel logic
+    const [isArmed, setIsArmed] = useState(false);
+    const [isArming, setIsArming] = useState(false);
+    const [remainingMs, setRemainingMs] = useState(HOLD_MS);
+    const armTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const tickRef = useRef<NodeJS.Timeout | null>(null);
+>>>>>>> Stashed changes
 
-  useEffect(() => {
-    if (isArmed) CoreAPI.start();
-    else CoreAPI.stop();
+    const activateSOS = () => {
+        const key = selected?.key ?? 'unspecified';
+        // Alert.alert('SOS sent', `SOS initiated for: ${key}`);
+        // reset state after send
+        setIsArming(false);
+        setRemainingMs(HOLD_MS);
+        setIsArmed(true);
+    };
+
+    const deactivateSOS = () => {
+        // Alert.alert('SOS cancelled', `SOS cancelled`);
+        setIsArmed(false);
+    };
+
+    useEffect(() => {
+        if (isArmed) CoreAPI.start();
+        else CoreAPI.stop();
 
         // return () => CoreAPI.cleanup();
     }, [isArmed]);
+<<<<<<< Updated upstream
     
   
+=======
+>>>>>>> Stashed changes
     const refreshFromCore = async () => {
         await CoreAPI.fetchLocation();
         setGeoX(typeof CoreAPI.geoX === 'number' ? CoreAPI.geoX : null);
         setGeoY(typeof CoreAPI.geoY === 'number' ? CoreAPI.geoY : null);
         setGeoTimestamp(typeof CoreAPI.timestamp === 'number' ? CoreAPI.timestamp : null);
         setLocation(typeof CoreAPI.location === 'string' ? CoreAPI.location : null);
+<<<<<<< Updated upstream
         
         setLocationLine(geoY != null && geoX != null
           ? `${geoY.toFixed(5)}, ${geoX.toFixed(5)}`
           : 'Fetching location...');
+=======
+>>>>>>> Stashed changes
     };
     refreshFromCore();
     const cancelArming = () => {
@@ -119,6 +143,7 @@ export default function SOS() {
         armTimeoutRef.current = null;
         }
         if (tickRef.current) {
+<<<<<<< Updated upstream
         clearInterval(tickRef.current);
         tickRef.current = null;
         }
@@ -132,66 +157,50 @@ export default function SOS() {
     armTimeoutRef.current = setTimeout(() => {
       armTimeoutRef.current = null;
       if (tickRef.current) {
+=======
+>>>>>>> Stashed changes
         clearInterval(tickRef.current);
         tickRef.current = null;
-      }
-      activateSOS();
-    }, HOLD_MS);
+        }
+    };
 
-    tickRef.current = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const left = Math.max(0, HOLD_MS - elapsed);
-      setRemainingMs(left);
-    }, 100);
-  };
+    const startArming = () => {
+        setIsArming(true);
+        setRemainingMs(HOLD_MS);
+        const start = Date.now();
 
-  // toggle on tap
-  const onPressSOS = () => {
-    if (isArmed) {
-      deactivateSOS();
-    } else if (isArming) {
-      // second press within 3s -> cancel
-      cancelArming();
-    } else {
-      startArming();
-    }
-  };
+        armTimeoutRef.current = setTimeout(() => {
+        armTimeoutRef.current = null;
+        if (tickRef.current) {
+            clearInterval(tickRef.current);
+            tickRef.current = null;
+        }
+        activateSOS();
+        }, HOLD_MS);
 
-  // cleanup timers on unmount / nav away
-  useEffect(() => () => cancelArming(), []);
+        tickRef.current = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const left = Math.max(0, HOLD_MS - elapsed);
+        setRemainingMs(left);
+        }, 100);
+    };
 
-  // pulse animation while arming
-  const pulse = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    if (isArming || isArmed) {
-      const loop = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulse, {
-            toValue: 1,
-            duration: isArmed ? 250 : 500,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulse, {
-            toValue: 0,
-            duration: isArmed ? 250 : 500,
-            useNativeDriver: true,
-          }),
-        ]),
-      );
-      loop.start();
-      return () => loop.stop();
-    } else {
-      pulse.stopAnimation();
-      pulse.setValue(0);
-    }
-  }, [isArming, isArmed, pulse]);
-  const scalePulse = pulse.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.05],
-  });
+    // toggle on tap
+    const onPressSOS = () => {
+        if (isArmed) {
+        deactivateSOS();
+        } else if (isArming) {
+        // second press within 3s -> cancel
+        cancelArming();
+        } else {
+        startArming();
+        }
+    };
 
-  const secondsLeft = Math.ceil(remainingMs / 1000);
+    // cleanup timers on unmount / nav away
+    useEffect(() => () => cancelArming(), []);
 
+<<<<<<< Updated upstream
 
     return (
         <SafeAreaView edges={['top']} style={styles.safe}>
@@ -223,85 +232,146 @@ export default function SOS() {
             <Text style={styles.smallBtnText}>Refresh</Text>
           </Pressable>
         </View>
+=======
+    // pulse animation while arming
+    const pulse = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+        if (isArming || isArmed) {
+        const loop = Animated.loop(
+            Animated.sequence([
+            Animated.timing(pulse, {
+                toValue: 1,
+                duration: isArmed ? 250 : 500,
+                useNativeDriver: true,
+            }),
+            Animated.timing(pulse, {
+                toValue: 0,
+                duration: isArmed ? 250 : 500,
+                useNativeDriver: true,
+            }),
+            ]),
+        );
+        loop.start();
+        return () => loop.stop();
+        } else {
+        pulse.stopAnimation();
+        pulse.setValue(0);
+        }
+    }, [isArming, isArmed, pulse]);
+    const scalePulse = pulse.interpolate({
+        inputRange: [0, 1],
+        outputRange: [1, 1.05],
+    });
+>>>>>>> Stashed changes
 
-        {/* Big SOS button */}
-        <View style={styles.sosWrap}>
-          <Animated.View
-            style={[
-              styles.ringOuter,
-              { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
-            ]}
-          />
-          <Animated.View
-            style={[
-              styles.ringMid,
-              { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
-            ]}
-          />
-          <Pressable
-            onPress={onPressSOS}
-            style={styles.sosCore}
-            android_disableSound
-          >
-            <Text style={styles.sosText}>{isArmed ? 'ARMED!!' : 'SOS'}</Text>
-            <Text style={styles.sosHint}>
-              {isArming
-                ? `Sending in ${secondsLeft}s • Tap to Cancel`
-                : isArmed
-                ? 'Keep tight! Help is on the way'
-                : 'Tap to Send'}
-            </Text>
-            {selected && (
-              <Text style={styles.selectedHint}>for: {selected.label}</Text>
-            )}
-          </Pressable>
-        </View>
+    const secondsLeft = Math.ceil(remainingMs / 1000);
 
-        {/* Main emergencies */}
-        <Text style={styles.groupTitle}>What’s your emergency?</Text>
-        <View style={styles.chips}>
-          {MAIN_EMERGENCIES.map(c => (
-            <Chip
-              key={c.key}
-              data={c}
-              selected={selected?.key === c.key}
-              onSelect={selectChip}
-            />
-          ))}
-        </View>
+    const locationLine =
+    geoY != null && geoX != null
+      ? `${geoY.toFixed(5)}, ${geoX.toFixed(5)}`
+      : 'Fetching location...';
 
-        {/* Side emergencies */}
-        <Text style={[styles.groupTitle, { marginTop: 14 }]}>
-          Something else?
-        </Text>
-        <View style={styles.chips}>
-          {OTHER_CHIPS.map(c => (
-            <Chip
-              key={c.key}
-              data={c}
-              selected={selected?.key === c.key}
-              onSelect={selectChip}
-            />
-          ))}
-        </View>
-
-        {/* Go back -> Home */}
-        <Pressable
-          onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'TopTabs', params: { screen: 'Home' } }],
-            })
-          }
-          style={styles.backLink}
+    return (
+        <SafeAreaView edges={['top']} style={styles.safe}>
+        <ScrollView
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.backText}>← Go back</Text>
-        </Pressable>
+            <Text style={styles.h1}>Having an emergency?</Text>
+            <Text style={styles.sub}> Tap SOS to arm. It will send in 3 seconds. Tap again to cancel before it sends.</Text>
 
-        <View style={{ height: 16 }} />
-      </ScrollView>
-    </SafeAreaView>
-  );
+
+            {/* Location card (wired to CORE) */}
+            <View style={styles.locCard}>
+                <Ionicons name="location-sharp" size={20} color={COLORS.ringCore} />
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.locTitle}>Your Location</Text>
+                    <Text style={styles.locText} numberOfLines={1}>{locationLine}</Text>
+                </View>
+                <Pressable onPress={refreshFromCore} style={({ pressed }) => [ styles.smallBtn, pressed ? styles.smallBtnPressed : styles.smallBtn, ]}>
+                    <Text style={styles.smallBtnText}>Refresh</Text>
+                </Pressable>
+            </View>
+
+            {/* Big SOS button */}
+            <View style={styles.sosWrap}>
+            <Animated.View
+                style={[
+                styles.ringOuter,
+                { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
+                ]}
+            />
+            <Animated.View
+                style={[
+                styles.ringMid,
+                { transform: [{ scale: isArming || isArmed ? scalePulse : 1 }] },
+                ]}
+            />
+            <Pressable
+                onPress={onPressSOS}
+                style={styles.sosCore}
+                android_disableSound
+            >
+                <Text style={styles.sosText}>{isArmed ? 'ARMED!!' : 'SOS'}</Text>
+                <Text style={styles.sosHint}>
+                {isArming
+                    ? `Sending in ${secondsLeft}s • Tap to Cancel`
+                    : isArmed
+                    ? 'Keep tight! Help is on the way'
+                    : 'Tap to Send'}
+                </Text>
+                {selected && (
+                <Text style={styles.selectedHint}>for: {selected.label}</Text>
+                )}
+            </Pressable>
+            </View>
+
+            {/* Main emergencies */}
+            <Text style={styles.groupTitle}>What’s your emergency?</Text>
+            <View style={styles.chips}>
+            {MAIN_EMERGENCIES.map(c => (
+                <Chip
+                key={c.key}
+                data={c}
+                selected={selected?.key === c.key}
+                onSelect={selectChip}
+                />
+            ))}
+            </View>
+
+            {/* Side emergencies */}
+            <Text style={[styles.groupTitle, { marginTop: 14 }]}>
+            Something else?
+            </Text>
+            <View style={styles.chips}>
+            {OTHER_CHIPS.map(c => (
+                <Chip
+                key={c.key}
+                data={c}
+                selected={selected?.key === c.key}
+                onSelect={selectChip}
+                />
+            ))}
+            </View>
+
+            {/* Go back -> Home */}
+            <Pressable
+            onPress={() =>
+                navigation.reset({
+                index: 0,
+                routes: [{ name: 'TopTabs', params: { screen: 'Home' } }],
+                })
+            }
+            style={styles.backLink}
+            >
+            <Text style={styles.backText}>← Go back</Text>
+            </Pressable>
+
+            <View style={{ height: 16 }} />
+        </ScrollView>
+        </SafeAreaView>
+    );
 }
 
 function Chip({
@@ -397,7 +467,11 @@ const styles = StyleSheet.create({
   },
   smallBtnPressed: {
     backgroundColor: '#f3f4f6',
+<<<<<<< Updated upstream
   },
+=======
+    },
+>>>>>>> Stashed changes
   smallBtnText: { fontWeight: '800', color: COLORS.text },
 
   sosWrap: {
